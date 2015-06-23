@@ -1,0 +1,10 @@
+---
+  # - name: install passenger
+  #   command: >
+  #     {{ passenger_gem_root_dir }}/gem install passenger --no-rdoc --no-ri --version {{ passenger_version }}
+  #     creates={{ passenger_gem_root_dir }}/passenger
+
+  - name: install passenger
+    gem: name=passenger version={{ passenger_version }} state=present executable={{ passenger_gem_root_dir }}/gem user_install=false
+    poll: 30
+    notify: rbenv rehash

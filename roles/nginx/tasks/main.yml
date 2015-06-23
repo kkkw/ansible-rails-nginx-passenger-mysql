@@ -1,0 +1,53 @@
+---
+- name: create group www
+  group: name=www state=present
+
+- name: crate user
+  user: name=www group=wheel groups=www
+
+- name: install lib for nginx
+  yum: name={{ item }} state=latest
+  with_items:
+    - pcre
+    - pcre-devel
+
+- name: download nginx tar ball
+  get_url: url=http://nginx.org/download/{{ nginx_version }}.tar.gz dest={{ nginx_src_dir }}
+  always_run: yes
+  register: downloaded_tarball
+- unarchive: src={{ downloaded_tarball.dest }} dest={{ nginx_src_dir }}
+
+- name: install ngix with passenger
+  command: >
+    {{ nginx_passenger_install_nginx_module_dir }}/passenger-install-nginx-module
+    --auto
+    --nginx-source-dir={{ nginx_src_dir }}/{{ nginx_version }}
+    --prefix={{ nginx_prefix_dir }}
+    --extra-configure-flags="{{ nginx_extra_configure_flags }}"
+
+- name: create bin dir
+  file: path={{ nginx_prefix_dir }}/bin state=directory
+
+- name: add nginxctl
+  template: src=nginxctl.j2 dest={{ nginx_prefix_dir }}/bin/nginxctl owner=www group=www mode=0755
+
+- name: copy nginx conf
+  template: src=nginx.conf.j2
+            dest={{ nginx_prefix_dir }}/conf/nginx.conf
+            owner=www
+            group=www
+  # notify: restart nginx
+
+- name: change path attribute nginx root
+  file: path={{ nginx_prefix_dir }} owner=www group=www mode=0775 recurse=yes
+
+#@todo
+# - name: service will start at boot
+#   command: update-rc.d nginx defaults
+#            creates={{ nginx_prefix_dir }}/bin/nginxctl
+
+- name: make virtual host dir
+  file: path={{ nginx_prefix_dir }}/conf/virtual state=directory owner=www group=www mode=0755
+
+- name: copy 404.html
+  copy: src=404.html dest={{ nginx_prefix_dir }}/html/404.html owner=www group=www mode=0755

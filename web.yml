@@ -1,0 +1,14 @@
+---
+- name: Install ruby
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+
+  roles:
+    - git
+    - rbenv
+    - ruby
+    - passenger
+    - bundler
+    - rails
+    - nginx

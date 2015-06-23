@@ -1,0 +1,3 @@
+---
+- name: rbenv rehash
+  command: "{{ passenger_rbenv_root_dir }}/rbenv rehash"

@@ -1,0 +1,4 @@
+---
+rails_gem_root_dir: /usr/local/rbenv/shims
+rails_version: 4.2.2
+rails_rbenv_root_dir: /usr/local/rbenv/bin

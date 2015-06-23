@@ -1,0 +1,7 @@
+---
+  - name: install bundler
+    command: >
+      {{ bundler_gem_root_dir }}/gem install bundler
+      creates={{ bundler_gem_root_dir }}/bundler
+    poll: 30
+    notify: rbenv rehash

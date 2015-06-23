@@ -1,0 +1,14 @@
+---
+nginx_version: nginx-1.8.0
+nginx_src_dir: /usr/local/src
+nginx_prefix_dir: /usr/local/nginx
+nginx_passenger_install_nginx_module_dir: /usr/local/rbenv/shims
+nginx_extra_configure_flags: >
+  --user=www
+  --group=www
+  --without-http_autoindex_module
+  --without-http_uwsgi_module
+  --with-http_gzip_static_module
+nginx_passenger_version: 5.0.10
+nginx_rbenv_ruby_version: 2.2.2
+nginx_ruby_lib_version: 2.2.0

@@ -1,0 +1,3 @@
+---
+- name: rbenv rehash
+  command: "{{ bundler_rbenv_root_dir }}/rbenv rehash"

@@ -1,0 +1,6 @@
+---
+
+  - name: install rails
+    gem: name=rails version={{ rails_version }} state=present executable={{ rails_gem_root_dir }}/gem user_install=false
+    poll: 30
+    notify: rbenv rehash

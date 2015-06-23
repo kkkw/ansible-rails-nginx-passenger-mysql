@@ -1,0 +1,36 @@
+---
+- name: install lib for rbenv
+  yum: name={{ item }} state=latest
+  with_items:
+    - openssl-devel
+    - libffi-devel
+
+- name: install ruby
+  yum: name=ruby state=latest
+
+- name: install rbenv
+  git: repo=https://github.com/sstephenson/rbenv.git dest={{ rbenv_root_dir }} executable={{ rbenv_executable_git }}
+
+- name: install ruby-build
+  git: repo=https://github.com/sstephenson/ruby-build.git dest={{ rbenv_root_dir }}/plugins/ruby-build executable={{ rbenv_executable_git }}
+
+- name: create shims dir
+  file: path={{ rbenv_root_dir }}/shims state=directory
+
+- name: create versions dir
+  file: path={{ rbenv_root_dir }}/versions state=directory
+
+- name: create group rbenv
+  group: name=rbenv state=present
+
+- name: crate rbenv user
+  user: name=rbenv group=rbenv
+
+- name: change path attribute rbenv root
+  file: path={{ rbenv_root_dir }} owner=rbenv group=rbenv mode=0775 recurse=yes
+
+- name: add rbenv initialization
+  template: src=rbenv.sh.j2 dest=/etc/profile.d/rbenv.sh owner=root group=wheel mode=0755
+
+- name: set gemrc for select users
+  copy: src=gemrc dest=/root/.gemrc owner=root group=root mode=0755

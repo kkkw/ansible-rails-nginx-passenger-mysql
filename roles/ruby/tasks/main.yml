@@ -1,0 +1,21 @@
+---
+
+- debug: var={{ ruby_version }}
+
+# * 2.2.2 (set by /usr/local/rbenv/version)
+- name: is installed specify version ruby
+  shell: cd; bash -lc "rbenv versions  | grep {{ ruby_version }} | tr '*' ' ' | sed -e 's/\s\+//' | cut -f1 -d' '"
+  always_run: yes
+  register: ruby_is_installed
+
+- debug: var={{ ruby_is_installed.stdout }}
+
+# poll: display status per 30sec
+- name: install ruby
+  shell: cd; bash -lc "CONFIGURE_OPTS=--disable-install-rdoc rbenv install {{ ruby_version }}"
+  when: ruby_is_installed.stdout != ruby_version
+  async: 600
+  poll: 30
+
+- name: set global ruby version
+  shell: cd; bash -lc "{{ ruby_rbenv_root_dir }}/rbenv global {{ ruby_version }} && {{ ruby_rbenv_root_dir }}/rbenv rehash"

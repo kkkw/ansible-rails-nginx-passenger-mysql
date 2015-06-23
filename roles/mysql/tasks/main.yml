@@ -1,0 +1,52 @@
+---
+- name: create group mysql
+  group: name=mysql state=present
+
+- name: crate user
+  user: name=mysql group=wheel groups=mysql
+
+- name: install lib for mysql
+  yum: name={{ item }} state=latest
+  with_items:
+    - cmake
+    - ncurses-devel
+
+- name: download mysql tar ball
+  get_url: url=http://dev.mysql.com/get/Downloads/MySQL-{{ mysql_major_version }}/mysql-{{ mysql_version }}.tar.gz dest={{ mysql_src_dir }}
+  always_run: yes
+  register: downloaded_tarball
+- unarchive: src={{ downloaded_tarball.dest }} dest={{ mysql_src_dir }}
+
+
+- name: install mysql
+  command: '{{ item }}'
+  with_items:
+    - cmake . -DCMAKE_INSTALL_PREFIX={{ mysql_prefix_dir }} -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_EXTRA_CHARSETS=all -DWITH_PIC=1
+    - make
+    - make install
+  args:
+    chdir: "{{ mysql_src_dir }}/mysql-{{ mysql_version }}"
+  # creates: {{ mysql_prefix_dir }}
+
+# - name: copy mysql conf
+#   template: src=mysql.conf.j2
+#             dest={{ mysql_prefix_dir }}/conf/my.cnf
+#             owner=mysql
+#             group=mysql
+  # notify: restart mysql
+
+- name: init mysql
+  command: "{{ mysql_prefix_dir }}/scripts/mysql_install_db --user=mysql --datadir={{ mysql_data_dir }}/var --basedir={{ mysql_prefix_dir }}"
+
+- name: change path attribute mysql root
+  file: path={{ mysql_prefix_dir }} owner=mysql group=mysql mode=0775 recurse=yes
+
+#@todo add service
+# - name: add mysqlctl
+#   template: src=mysqlctl.j2 dest={{ mysql_prefix_dir }}/bin/mysqlctl owner=mysql group=mysql mode=0755
+
+#@todo
+# - name: service will start at boot
+#   command: update-rc.d mysql defaults
+#            creates={{ mysql_prefix_dir }}/bin/mysqlctl
+

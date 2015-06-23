@@ -1,0 +1,3 @@
+---
+- name: rbenv rehash
+  command: "{{ rails_rbenv_root_dir }}/rbenv rehash"

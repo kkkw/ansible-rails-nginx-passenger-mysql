@@ -1,0 +1,4 @@
+---
+passenger_gem_root_dir: /usr/local/rbenv/shims
+passenger_version: 5.0.10
+passenger_rbenv_root_dir: /usr/local/rbenv/bin
